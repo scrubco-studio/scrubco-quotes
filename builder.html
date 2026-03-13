@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scrub Co – Quote Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #f2efe8;
+    --dark: #1a1a1a;
+    --green: #3d7a5e;
+    --green-light: #5aab84;
+    --card: #ffffff;
+    --border: #e2e2e2;
+  }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--cream);
+    min-height: 100vh;
+    padding: 0 0 80px;
+    color: var(--dark);
+  }
+
+  /* Header */
+  .header {
+    background: var(--dark);
+    padding: 20px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .header-sub {
+    font-size: 0.72rem;
+    color: #888;
+    margin-top: 1px;
+  }
+
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* Sections */
+  .section {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 18px 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.055);
+  }
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: #bbb;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+
+  /* Form rows */
+  .row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .row:last-child { margin-bottom: 0; }
+
+  .field {
+    flex: 1;
+    min-width: 130px;
+  }
+  .field label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 5px;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    font-family: 'Barlow', sans-serif;
+    background: #fafafa;
+    color: var(--dark);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  .field textarea { resize: vertical; }
+
+  /* Price preview */
+  .preview-cards {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .preview-card {
+    flex: 1;
+    min-width: 120px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 10px;
+    text-align: center;
+  }
+  .preview-card.sel {
+    border-color: var(--green);
+    background: #f0faf5;
+  }
+  .preview-card-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .preview-price-bar {
+    background: var(--dark);
+    border-radius: 7px;
+    padding: 8px 4px;
+  }
+  .preview-card.sel .preview-price-bar {
+    background: var(--green);
+  }
+  .preview-price {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: white;
+  }
+  .preview-freq {
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.75);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-top: 1px;
+  }
+  .preview-rec {
+    font-size: 0.62rem;
+    color: var(--green);
+    font-weight: 700;
+    margin-top: 5px;
+  }
+
+  /* Output boxes */
+  .output-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 5px;
+    display: block;
+  }
+  .output-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+    margin-bottom: 14px;
+  }
+  .output-row input {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.78rem;
+    font-family: 'Barlow', sans-serif;
+    background: #f5f5f5;
+    color: #666;
+    outline: none;
+  }
+  .output-textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.82rem;
+    font-family: 'Barlow', sans-serif;
+    background: #f5f5f5;
+    color: #444;
+    outline: none;
+    resize: vertical;
+    margin-bottom: 8px;
+  }
+
+  /* Buttons */
+  .btn {
+    background: var(--dark);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 0.82rem;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn.copied {
+    background: var(--green);
+  }
+  .btn.full {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.88rem;
+    margin-top: 4px;
+  }
+
+  /* Setup note */
+  .setup-note {
+    background: var(--dark);
+    border-radius: 14px;
+    padding: 16px 18px;
+    font-size: 0.8rem;
+    color: #888;
+    line-height: 1.7;
+  }
+  .setup-note strong { color: var(--green-light); }
+  .setup-note code {
+    background: #2a2a2a;
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 0.75rem;
+  }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1.5px solid var(--border);
+    margin: 14px 0;
+  }
+
+  @media (max-width: 400px) {
+    .preview-cards { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">🧹 Scrub Co Quote Builder</div>
+    <div class="header-sub">Internal use only</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- Client Details -->
+  <div class="section">
+    <div class="section-title">👤 Client Details</div>
+    <div class="row">
+      <div class="field"><label>First Name</label><input id="name" type="text" placeholder="e.g. Aaron" oninput="update()"></div>
+      <div class="field"><label>Phone (internal)</label><input id="phone" type="tel" placeholder="+61 4xx xxx xxx"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Email (internal)</label><input id="email" type="email" placeholder="client@email.com"></div>
+      <div class="field"><label>Suburb</label><input id="suburb" type="text" placeholder="e.g. Highfields"></div>
+    </div>
+  </div>
+
+  <!-- Job Details -->
+  <div class="section">
+    <div class="section-title">🏠 Job Details (Internal Only)</div>
+    <div class="row">
+      <div class="field">
+        <label>Bedrooms</label>
+        <select id="bedrooms">
+          <option value="">—</option>
+          <option>1 bed</option><option>2 bed</option><option>3 bed</option>
+          <option>4 bed</option><option>5 bed</option><option>6 bed</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Bathrooms</label>
+        <select id="bathrooms">
+          <option value="">—</option>
+          <option>1 bath</option><option>2 bath</option><option>3 bath</option>
+          <option>4 bath</option><option>5 bath</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Internal Notes</label><input id="jobnotes" type="text" placeholder="e.g. dog at home, gate code 1234..."></div>
+    </div>
+  </div>
+
+  <!-- Pricing -->
+  <div class="section">
+    <div class="section-title">💰 Quote Pricing</div>
+    <div class="row">
+      <div class="field">
+        <label>Frequency</label>
+        <select id="freq" onchange="update()">
+          <option value="week">Per Week</option>
+          <option value="fn">Per Fortnight</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Highlight Package</label>
+        <select id="selected" onchange="update()">
+          <option value="">None</option>
+          <option value="mini">Mini Maintenance</option>
+          <option value="deluxe" selected>Deluxe Clean</option>
+          <option value="premium">Premium Clean</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Mini Maintenance $</label><input id="mini" type="number" placeholder="e.g. 85" oninput="update()"></div>
+      <div class="field"><label>Deluxe Clean $</label><input id="deluxe" type="number" placeholder="e.g. 120" oninput="update()"></div>
+      <div class="field"><label>Premium Clean $</label><input id="premium" type="number" placeholder="e.g. 160" oninput="update()"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Client-visible note (optional)</label><input id="notes" type="text" placeholder="e.g. Price includes travel fee." oninput="update()"></div>
+    </div>
+  </div>
+
+  <!-- Preview -->
+  <div class="section" id="preview-section" style="display:none">
+    <div class="section-title">👀 Preview</div>
+    <div class="preview-cards" id="preview-cards"></div>
+  </div>
+
+  <!-- Share -->
+  <div class="section">
+    <div class="section-title">🔗 Share with Client</div>
+
+    <span class="output-label">Quote Link</span>
+    <div class="output-row">
+      <input id="url-output" readonly value="Fill in pricing above to generate link">
+      <button class="btn" id="btn-link" onclick="copyText('url-output','btn-link')">Copy</button>
+    </div>
+
+    <hr class="divider">
+
+    <span class="output-label">Facebook Messenger / SMS</span>
+    <textarea class="output-textarea" id="msg-output" rows="8" readonly></textarea>
+    <button class="btn full" id="btn-msg" onclick="copyText('msg-output','btn-msg')">Copy Messenger Message</button>
+
+    <hr class="divider">
+
+    <span class="output-label">Email Template</span>
+    <textarea class="output-textarea" id="email-output" rows="13" readonly></textarea>
+    <button class="btn full" id="btn-email" onclick="copyText('email-output','btn-email')">Copy Email</button>
+  </div>
+
+  <div class="setup-note">
+    <strong>📱 Add to home screen:</strong> In your browser tap <strong>Share → Add to Home Screen</strong> to bookmark this as an app icon on your phone.
+  </div>
+
+</div>
+
+<script>
+  var BASE_URL = 'https://scrubco-studio.github.io/scrubco-quotes/quote.html';
+
+  function val(id) {
+    return document.getElementById(id).value.trim();
+  }
+
+  function buildURL() {
+    var p = new URLSearchParams();
+    var name = val('name'), mini = val('mini'), deluxe = val('deluxe'),
+        premium = val('premium'), freq = val('freq'), selected = val('selected'), notes = val('notes');
+    if (name) p.set('name', name);
+    if (mini) p.set('mini', mini);
+    if (deluxe) p.set('deluxe', deluxe);
+    if (premium) p.set('premium', premium);
+    p.set('freq', freq);
+    if (selected) p.set('selected', selected);
+    if (notes) p.set('notes', notes);
+    return BASE_URL + '?' + p.toString();
+  }
+
+  function buildMsg() {
+    var name = val('name') || 'there';
+    var freq = val('freq');
+    var fl = freq === 'fn' ? 'P/FN' : 'P/Week';
+    var mini = val('mini'), deluxe = val('deluxe'), premium = val('premium');
+    var lines = [];
+    if (mini) lines.push('🧹 Mini Maintenance — $' + mini + ' P/Week');
+    if (deluxe) lines.push('✨ Deluxe Clean — $' + deluxe + ' ' + fl);
+    if (premium) lines.push('⭐ Premium Clean — $' + premium + ' ' + fl);
+    return 'Hi ' + name + '! 👋 Thanks for chatting with us at Scrub Co!\n\nHere\'s your personalised quote:\n\n' +
+      lines.join('\n') + '\n\n👉 View your full quote here: ' + buildURL() +
+      '\n\nTo book, just reply letting us know which package you\'d like and your preferred clean dates — we\'ll get you all sorted! 😊\n\nJazz | Scrub Co ✨';
+  }
+
+  function buildEmail() {
+    var name = val('name') || 'there';
+    var freq = val('freq');
+    var fl = freq === 'fn' ? 'P/FN' : 'P/Week';
+    var mini = val('mini'), deluxe = val('deluxe'), premium = val('premium');
+    var lines = [];
+    if (mini) lines.push('• Mini Maintenance: $' + mini + ' P/Week');
+    if (deluxe) lines.push('• Deluxe Clean: $' + deluxe + ' ' + fl);
+    if (premium) lines.push('• Premium Clean: $' + premium + ' ' + fl);
+    return 'Subject: Your Personalised Quote from Scrub Co 🧹\n\nHi ' + name + ',\n\nThanks so much for your interest in Scrub Co!\n\nHere\'s your personalised quote:\n\n' +
+      lines.join('\n') + '\n\n👉 View your full quote here:\n' + buildURL() +
+      '\n\nTo get started, simply reply with:\n  1. Which package you\'d like\n  2. Your preferred clean dates\n\nWe\'ll get you locked in and sorted! 😊\n\nWarm regards,\nJazz\nScrub Co – Highfields, Toowoomba\n📞 +61 450 953 117\n🌐 www.scrubco.org';
+  }
+
+  function update() {
+    var mini = val('mini'), deluxe = val('deluxe'), premium = val('premium');
+    var freq = val('freq'), selected = val('selected');
+    var fl = freq === 'fn' ? 'P/FN' : 'P/Week';
+    var hasPrice = mini || deluxe || premium;
+
+    // URL
+    document.getElementById('url-output').value = hasPrice ? buildURL() : 'Fill in pricing above to generate link';
+
+    // Msg & Email
+    document.getElementById('msg-output').value = buildMsg();
+    document.getElementById('email-output').value = buildEmail();
+
+    // Preview
+    var previewSection = document.getElementById('preview-section');
+    var previewCards = document.getElementById('preview-cards');
+    previewCards.innerHTML = '';
+
+    if (hasPrice) {
+      previewSection.style.display = 'block';
+      var pkgs = [
+        { id: 'mini', label: 'Mini Maintenance', price: mini, freq: 'P/WEEK' },
+        { id: 'deluxe', label: 'Deluxe Clean', price: deluxe, freq: fl.toUpperCase() },
+        { id: 'premium', label: 'Premium Clean', price: premium, freq: fl.toUpperCase() }
+      ];
+      pkgs.forEach(function(p) {
+        if (!p.price) return;
+        var isSel = selected === p.id;
+        var div = document.createElement('div');
+        div.className = 'preview-card' + (isSel ? ' sel' : '');
+        div.innerHTML =
+          '<div class="preview-card-name">' + p.label + '</div>' +
+          '<div class="preview-price-bar">' +
+            '<div class="preview-price">$' + p.price + '</div>' +
+            '<span class="preview-freq">' + p.freq + '</span>' +
+          '</div>' +
+          (isSel ? '<div class="preview-rec">★ RECOMMENDED</div>' : '');
+        previewCards.appendChild(div);
+      });
+    } else {
+      previewSection.style.display = 'none';
+    }
+  }
+
+  function copyText(inputId, btnId) {
+    var text = document.getElementById(inputId).value;
+    var btn = document.getElementById(btnId);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(function() {
+      btn.textContent = btn.id === 'btn-link' ? 'Copy' : btn.id === 'btn-msg' ? 'Copy Messenger Message' : 'Copy Email';
+      btn.classList.remove('copied');
+    }, 2000);
+  }
+
+  // Init
+  update();
+</script>
+</body>
+</html>
